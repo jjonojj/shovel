@@ -1,4 +1,4 @@
-# shovel
+# shovel🌱
 
 **note: this project is a work in progress and 80% of the interpreter isnt implemented yet.**
 
