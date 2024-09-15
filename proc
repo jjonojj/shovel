@@ -1,4 +1,4 @@
 void main() {
     int x = 5;
-    print(fmt("x is: ", x));
+    print("hai");
 }

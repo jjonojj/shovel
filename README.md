@@ -24,7 +24,7 @@ the syntax of the programming language is not really defined yet, but i want it 
 
 void main() {
     int x = 5;
-    print(fmt("x is: ", x));
+    print("hai");
 }
 
 ```
