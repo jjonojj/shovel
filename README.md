@@ -1,6 +1,6 @@
 # shovel
 
-**note: this project is a work in progress and 80% of the interpreter arent implemented yet.**
+**note: this project is a work in progress and 80% of the interpreter isnt implemented yet.**
 
 a work in progress programming language written in c. i originally started it because i wanted to learn more about programming languages and how they work.
 
