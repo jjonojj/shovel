@@ -26,7 +26,8 @@ typedef struct
 
 typedef struct
 {
-
+    char* name;
+    int value;
 } Integer;
 
 void tokenize(const char *input, char ***tokens, int *num_tokens)
@@ -123,7 +124,16 @@ int main(int argc, char **argv)
 {
 
     // hardcode program because im too lazy to do actual work. SHOULD print hey
-    char *program = 'void main() { print("hey"); }';
+    char *code = "void main() { print(\"hey\"); }";
+
+    char** tokens = NULL;
+    int num_tokens = 0;
+
+    tokenize(code, &tokens, &num_tokens);
+
+    for (int i = 0; i < num_tokens; i++) {
+        printf("[%s]\n", tokens[i]);
+    }
 
     return 0;
 }
