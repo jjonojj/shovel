@@ -1,4 +1,3 @@
-// the shovel language interpreter.
 
 #include <stdio.h>
 #include <stdlib.h>
