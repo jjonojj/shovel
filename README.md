@@ -16,7 +16,7 @@ make
 
 not officially supported, but will probably work with mingw64 or with wsl
 
-## running:
+## ---
 
 the syntax of the programming language is not really defined yet, but i want it to look something like this:
 
@@ -28,5 +28,7 @@ void main() {
 }
 
 ```
+
+im not sure if it will have a type system yet so the above code is subject to change.
 
 <sub><sup>mit licensed so sell that shit yea<sup><sub>

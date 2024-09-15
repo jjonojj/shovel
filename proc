@@ -1,5 +1,4 @@
-void main ()
-{
+void main() {
     int x = 5;
-    return 0;
+    print(fmt("x is: ", x));
 }
