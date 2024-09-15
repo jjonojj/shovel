@@ -4,31 +4,57 @@
 #include <ctype.h>
 
 #define DELIMITERS " \t\n(){}\";"
+#define VARIABLE_BUFFER_SIZE 256
 
 typedef enum
 {
+    TYPE_UNDEF = -1,
+
     TYPE_VOID,
-    TYPE_INT
+    TYPE_INT,
+
+    TYPE_SIZE
 } Type;
 const char *types[] = {"void", "int"};
 
 typedef enum
 {
-    KEYW_RET
+    KEYW_UNDEF = -1,
+
+    KEYW_RET,
+
+    KEYW_SIZE
 } Keyword;
 const char *keywords[] = {"return"};
 
 typedef struct
 {
+    int ptr;
     Type ret_type;
     char *body;
 } Function;
 
 typedef struct
 {
-    char* name;
+    const char *name;
     int value;
 } Integer;
+
+Type map_type(const char* query) {
+    for (int i = 0; i < TYPE_SIZE; i++) {
+        if (strcmp(query, types[i]) == 0) return i;
+    }
+
+    return -1;
+}
+
+Keyword map_keyw(const char* query) {
+    for (int i = 0; i < KEYW_SIZE; i++) {
+        if (strcmp(query, keywords[i]) == 0) return i;
+    }
+
+    return -1;
+}
 
 void tokenize(const char *input, char ***tokens, int *num_tokens)
 {
@@ -120,20 +146,72 @@ void tokenize(const char *input, char ***tokens, int *num_tokens)
     *num_tokens = token_count;
 }
 
+void interpret(const char **program, int prog_length)
+{
+    int initial_ptr = 0;
+    Integer ints[VARIABLE_BUFFER_SIZE];
+    for (int i = 0; i < prog_length; i++) {
+        const char* cur = program[i];
+        // assuming first word is type
+        Type cur_type = map_type(cur);
+        if (cur_type == TYPE_UNDEF) {
+            perror("unexpected token");
+            exit(1);
+        }
+
+        // assuming following structure:
+        // type - name - parentheses if function, semicolon or [equal and value] if variable; 
+        // so we check if program[i+3] is a opening parenthesis, if yes its a function if its semicolon or equal its a variable, and else we perror and exit w 1
+
+        if (strcmp(program[i+2], "(") == 0)
+        {
+            // function I GUESS
+
+        } else if (strcmp(program[i+2], "=") == 0)
+        {
+            // variable, but defined at declaration
+            switch (cur_type) {
+                case TYPE_VOID:
+                    perror("tried to assign value to variable of type void.");
+                    exit(1);
+                case TYPE_INT:
+                    {
+                        Integer var = {program[i+1], atoi(program[i+4])};
+                    }
+                    // TODO: COMPILE!!!!!!
+                    // TODO: push variable into ints[]
+                default:
+                    return;
+            }
+
+
+        } else if (strcmp(program[i+2], ";") == 0)
+        {
+            // variable, but NOT defined at declaration
+            
+        }
+    }
+}
+
 int main(int argc, char **argv)
 {
 
     // hardcode program because im too lazy to do actual work. SHOULD print hey
     char *code = "void main() { print(\"hey\"); }";
 
-    char** tokens = NULL;
+    char **tokens = NULL;
     int num_tokens = 0;
 
     tokenize(code, &tokens, &num_tokens);
 
-    for (int i = 0; i < num_tokens; i++) {
+    for (int i = 0; i < num_tokens; i++)
+    {
         printf("[%s]\n", tokens[i]);
     }
+
+    printf("---\n");
+
+    interpret(tokens, num_tokens);
 
     return 0;
 }
