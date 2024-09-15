@@ -5,57 +5,74 @@
 
 #define DELIMITERS " \t\n(){}\";"
 
-typedef enum {
+typedef enum
+{
     TYPE_VOID,
     TYPE_INT
-}Type;
-const char* types[] = {"void", "int"}; 
+} Type;
+const char *types[] = {"void", "int"};
 
-typedef enum {
+typedef enum
+{
     KEYW_RET
 } Keyword;
-const char* keywords[] = {"return"};
+const char *keywords[] = {"return"};
 
-typedef struct {
+typedef struct
+{
     Type ret_type;
-    char* body;
+    char *body;
 } Function;
 
-void tokenize(const char *input, char ***tokens, int *num_tokens) {   
+typedef struct
+{
+
+} Integer;
+
+void tokenize(const char *input, char ***tokens, int *num_tokens)
+{
     size_t buffer_size = 10;
     size_t token_count = 0;
 
     *tokens = (char **)malloc(buffer_size * sizeof(char *));
-    if (*tokens == NULL) {
+    if (*tokens == NULL)
+    {
         perror("Failed to allocate memory");
         exit(1);
     }
 
     const char *start = input;
     const char *end = NULL;
-    while (*start) { 
-        while (isspace((unsigned char)*start)) {
+    while (*start)
+    {
+        while (isspace((unsigned char)*start))
+        {
             start++;
         }
-        
-        if (*start == '\0') break;
-    
-        if (strchr(DELIMITERS, *start)) {
-            
+
+        if (*start == '\0')
+            break;
+
+        if (strchr(DELIMITERS, *start))
+        {
+
             end = start + 1;
             size_t length = 1;
             char *token = (char *)malloc(length + 1);
-            if (token == NULL) {
+            if (token == NULL)
+            {
                 perror("Failed to allocate memory");
                 exit(1);
             }
             strncpy(token, start, length);
             token[length] = '\0';
-            
-            if (token_count >= buffer_size) {
+
+            if (token_count >= buffer_size)
+            {
                 buffer_size *= 2;
                 *tokens = (char **)realloc(*tokens, buffer_size * sizeof(char *));
-                if (*tokens == NULL) {
+                if (*tokens == NULL)
+                {
                     perror("Failed to reallocate memory");
                     exit(1);
                 }
@@ -63,24 +80,30 @@ void tokenize(const char *input, char ***tokens, int *num_tokens) {
             (*tokens)[token_count++] = token;
 
             start = end;
-        } else {
-            
+        }
+        else
+        {
+
             end = strpbrk(start, DELIMITERS);
-            if (end == NULL) end = start + strlen(start);
+            if (end == NULL)
+                end = start + strlen(start);
 
             size_t length = end - start;
             char *token = (char *)malloc(length + 1);
-            if (token == NULL) {
+            if (token == NULL)
+            {
                 perror("Failed to allocate memory");
                 exit(1);
             }
             strncpy(token, start, length);
             token[length] = '\0';
-            
-            if (token_count >= buffer_size) {
+
+            if (token_count >= buffer_size)
+            {
                 buffer_size *= 2;
                 *tokens = (char **)realloc(*tokens, buffer_size * sizeof(char *));
-                if (*tokens == NULL) {
+                if (*tokens == NULL)
+                {
                     perror("Failed to reallocate memory");
                     exit(1);
                 }
@@ -91,17 +114,16 @@ void tokenize(const char *input, char ***tokens, int *num_tokens) {
         }
     }
 
-    *tokens = (char**)realloc(*tokens, (token_count + 1) * sizeof(char*));
+    *tokens = (char **)realloc(*tokens, (token_count + 1) * sizeof(char *));
     (*tokens)[token_count] = NULL;
     *num_tokens = token_count;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv)
+{
 
     // hardcode program because im too lazy to do actual work. SHOULD print hey
-    char* program = 'void main() { print("hey"); }';
-
-
+    char *program = 'void main() { print("hey"); }';
 
     return 0;
 }
