@@ -5,6 +5,7 @@
 
 #define DELIMITERS " \t\n(){}\";"
 #define VARIABLE_BUFFER_SIZE 256
+#define FUNCTION_BUFFER_SIZE 256
 
 typedef enum
 {
@@ -30,6 +31,7 @@ const char *keywords[] = {"return"};
 typedef struct
 {
     int ptr;
+    char* name;
     Type ret_type;
     char *body;
 } Function;
@@ -51,6 +53,16 @@ Type map_type(const char* query) {
 Keyword map_keyw(const char* query) {
     for (int i = 0; i < KEYW_SIZE; i++) {
         if (strcmp(query, keywords[i]) == 0) return i;
+    }
+
+    return -1;
+}
+
+int fn_search(const char* query, const Function* functions, int len) {
+    for (int i = 0; i < len; i++) {
+        if (strcmp(query, functions[i].name) == 0) {
+            return i;
+        }
     }
 
     return -1;
@@ -153,11 +165,21 @@ void interpret(const char **program, int prog_length)
     Integer ints[VARIABLE_BUFFER_SIZE];
     int var_int_ptr = 0;
 
+    Function funcs[FUNCTION_BUFFER_SIZE];
+    int func_int_ptr = 0;
+
     for (int i = 0; i < prog_length; i++) {
         const char* cur = program[i];
         // assuming first word is type
         Type cur_type = map_type(cur);
         if (cur_type == TYPE_UNDEF) {
+            // assuming first word is function call
+
+            if (fn_search(cur, funcs, func_int_ptr) == 0) {
+                // function found, exec it
+            }
+
+            // yea i have no idea
             perror("unexpected token");
             exit(1);
         }
