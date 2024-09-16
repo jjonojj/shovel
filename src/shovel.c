@@ -149,7 +149,10 @@ void tokenize(const char *input, char ***tokens, int *num_tokens)
 void interpret(const char **program, int prog_length)
 {
     int initial_ptr = 0;
+
     Integer ints[VARIABLE_BUFFER_SIZE];
+    int var_int_ptr = 0;
+
     for (int i = 0; i < prog_length; i++) {
         const char* cur = program[i];
         // assuming first word is type
@@ -171,31 +174,52 @@ void interpret(const char **program, int prog_length)
         {
             // variable, but defined at declaration
             switch (cur_type) {
-                case TYPE_VOID:
-                    perror("tried to assign value to variable of type void.");
-                    exit(1);
                 case TYPE_INT:
                     {
                         Integer var = {program[i+1], atoi(program[i+4])};
+                        // push variable into ints[]
+
+                        if (!(var_int_ptr < VARIABLE_BUFFER_SIZE)) {
+                            perror("variable buffer overflow");
+                            exit(1);
+                        }
+
+                        ints[var_int_ptr] = var;
+                        var_int_ptr++;
                     }
-                    // TODO: COMPILE!!!!!!
-                    // TODO: push variable into ints[]
                 default:
-                    return;
+                    perror("unexpected variable type.")
+                    exit(1)
             }
 
 
         } else if (strcmp(program[i+2], ";") == 0)
         {
             // variable, but NOT defined at declaration
-            
+            switch (cur_type) {
+                case TYPE_INT:
+                    {
+                        Integer var = {program[i+1], 0};
+                        // push variable into ints[]
+
+                        if (!(var_int_ptr < VARIABLE_BUFFER_SIZE)) {
+                            perror("variable buffer overflow");
+                            exit(1);
+                        }
+
+                        ints[var_int_ptr] = var;
+                        var_int_ptr++;
+                    }
+                default:
+                    perror("unexpected variable type.")
+                    exit(1)
+            }
         }
     }
 }
 
 int main(int argc, char **argv)
 {
-
     // hardcode program because im too lazy to do actual work. SHOULD print hey
     char *code = "void main() { print(\"hey\"); }";
 
