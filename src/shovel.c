@@ -188,8 +188,8 @@ void interpret(const char **program, int prog_length)
                         var_int_ptr++;
                     }
                 default:
-                    perror("unexpected variable type.")
-                    exit(1)
+                    perror("unexpected variable type.");
+                    exit(1);
             }
 
 
@@ -211,8 +211,8 @@ void interpret(const char **program, int prog_length)
                         var_int_ptr++;
                     }
                 default:
-                    perror("unexpected variable type.")
-                    exit(1)
+                    perror("unexpected variable type.");
+                    exit(1);
             }
         }
     }
@@ -235,7 +235,7 @@ int main(int argc, char **argv)
 
     printf("---\n");
 
-    interpret(tokens, num_tokens);
+    //interpret(tokens, num_tokens);
 
     return 0;
 }
