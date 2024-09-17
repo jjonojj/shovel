@@ -205,7 +205,6 @@ void interpret(const char **program, int prog_length)
 
         // functions - only builtins for now
         
-
         // variable section
         if (strcmp(program[i+2], "=") == 0)
         {
@@ -258,7 +257,7 @@ void interpret(const char **program, int prog_length)
 int main(int argc, char **argv)
 {
     // hardcode program because im too lazy to do actual work. SHOULD print hey
-    char *code = "void main() { print(\"hey\"); }";
+    char *code = "void main() { int x = 4; }";
 
     char **tokens = NULL;
     int num_tokens = 0;
