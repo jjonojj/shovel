@@ -12,6 +12,8 @@ a work in progress programming language written in c. i originally started it be
 make
 ```
 
+above specified command will generate build/shovel, which can be used to interpret files.
+
 **windows**:
 
 not officially supported, but will probably work with mingw64 or with wsl
