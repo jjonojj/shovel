@@ -7,6 +7,8 @@
 #define VARIABLE_BUFFER_SIZE 256
 #define FUNCTION_BUFFER_SIZE 256
 
+// hi!!
+
 typedef enum
 {
     TYPE_UNDEF = -1,
