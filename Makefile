@@ -1,2 +1,2 @@
 shovel:
-	gcc -o shovel src/shovel.c
+	gcc -o build/shovel src/shovel.c
