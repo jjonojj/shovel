@@ -30,17 +30,45 @@ const char *keywords[] = {"return"};
 
 typedef struct
 {
-    int ptr;
-    char* name;
-    Type ret_type;
-    char *body;
-} Function;
-
-typedef struct
-{
     const char *name;
     int value;
 } Integer;
+
+typedef struct
+{
+    char* name;
+    void (*fn)(int argc, char** argv);
+} StdFunction;
+
+// standard library (todo: refactor)
+
+void std_print(int argc, char** argv) {
+    if (argc == 1) {
+        printf("%s\n", argv[0]);
+        return;
+    }
+    for (int i = 0; i < argc; ++i) {
+        printf("%s ", argv[i]);
+    }
+    printf("\n");
+}
+
+StdFunction std_functions[] = {
+    {"print", std_print},
+};
+
+void call_function(const char* function_name, int argc, char** argv) {
+    // Look for the function in the standard functions table
+    for (int i = 0; i < sizeof(std_functions) / sizeof(StdFunction); ++i) {
+        if (strcmp(std_functions[i].name, function_name) == 0) {
+            std_functions[i].fn(argc, argv); // Call the standard function
+            return;
+        }
+    }
+
+    // Handle user-defined functions or error if not found
+    printf("err: undefined function '%s'\n", function_name);
+}
 
 Type map_type(const char* query) {
     for (int i = 0; i < TYPE_SIZE; i++) {
@@ -58,16 +86,6 @@ Keyword map_keyw(const char* query) {
     return -1;
 }
 
-int fn_search(const char* query, const Function* functions, int len) {
-    for (int i = 0; i < len; i++) {
-        if (strcmp(query, functions[i].name) == 0) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
 void tokenize(const char *input, char ***tokens, int *num_tokens)
 {
     size_t buffer_size = 10;
@@ -76,7 +94,7 @@ void tokenize(const char *input, char ***tokens, int *num_tokens)
     *tokens = (char **)malloc(buffer_size * sizeof(char *));
     if (*tokens == NULL)
     {
-        perror("Failed to allocate memory");
+        perror("err: failed to allocate memory");
         exit(1);
     }
 
@@ -100,7 +118,7 @@ void tokenize(const char *input, char ***tokens, int *num_tokens)
             char *token = (char *)malloc(length + 1);
             if (token == NULL)
             {
-                perror("Failed to allocate memory");
+                perror("err: failed to allocate memory");
                 exit(1);
             }
             strncpy(token, start, length);
@@ -112,7 +130,7 @@ void tokenize(const char *input, char ***tokens, int *num_tokens)
                 *tokens = (char **)realloc(*tokens, buffer_size * sizeof(char *));
                 if (*tokens == NULL)
                 {
-                    perror("Failed to reallocate memory");
+                    perror("err: failed to reallocate memory");
                     exit(1);
                 }
             }
@@ -131,7 +149,7 @@ void tokenize(const char *input, char ***tokens, int *num_tokens)
             char *token = (char *)malloc(length + 1);
             if (token == NULL)
             {
-                perror("Failed to allocate memory");
+                perror("err: failed to allocate memory");
                 exit(1);
             }
             strncpy(token, start, length);
@@ -143,7 +161,7 @@ void tokenize(const char *input, char ***tokens, int *num_tokens)
                 *tokens = (char **)realloc(*tokens, buffer_size * sizeof(char *));
                 if (*tokens == NULL)
                 {
-                    perror("Failed to reallocate memory");
+                    perror("err: failed to reallocate memory");
                     exit(1);
                 }
             }
@@ -165,7 +183,6 @@ void interpret(const char **program, int prog_length)
     Integer ints[VARIABLE_BUFFER_SIZE];
     int var_int_ptr = 0;
 
-    Function funcs[FUNCTION_BUFFER_SIZE];
     int func_int_ptr = 0;
 
     for (int i = 0; i < prog_length; i++) {
@@ -173,26 +190,22 @@ void interpret(const char **program, int prog_length)
         // assuming first word is type
         Type cur_type = map_type(cur);
         if (cur_type == TYPE_UNDEF) {
-            // assuming first word is function call
-
-            if (fn_search(cur, funcs, func_int_ptr) == 0) {
-                // function found, exec it
-            }
-
-            // yea i have no idea
-            perror("unexpected token");
-            exit(1);
+            if (!(strcmp(program[i+1], "(") == 0)) {
+                printf("err: undefined type but no function");
+                exit(1);
+            } 
         }
 
         // assuming following structure:
         // type - name - parentheses if function, semicolon or [equal and value] if variable; 
         // so we check if program[i+3] is a opening parenthesis, if yes its a function if its semicolon or equal its a variable, and else we perror and exit w 1
 
-        if (strcmp(program[i+2], "(") == 0)
-        {
-            // function I GUESS
 
-        } else if (strcmp(program[i+2], "=") == 0)
+        // functions - only builtins for now
+        
+
+        // variable section
+        if (strcmp(program[i+2], "=") == 0)
         {
             // variable, but defined at declaration
             switch (cur_type) {
@@ -202,7 +215,7 @@ void interpret(const char **program, int prog_length)
                         // push variable into ints[]
 
                         if (!(var_int_ptr < VARIABLE_BUFFER_SIZE)) {
-                            perror("variable buffer overflow");
+                            perror("runtime err: variable buffer overflow");
                             exit(1);
                         }
 
@@ -210,14 +223,14 @@ void interpret(const char **program, int prog_length)
                         var_int_ptr++;
                     }
                 default:
-                    perror("unexpected variable type.");
+                    perror("err: unexpected variable type.");
                     exit(1);
             }
 
 
         } else if (strcmp(program[i+2], ";") == 0)
         {
-            // variable, but NOT defined at declaration
+            // variable, but NOT defined at declaration (we just set it to 0 yeehaw)
             switch (cur_type) {
                 case TYPE_INT:
                     {
@@ -225,7 +238,7 @@ void interpret(const char **program, int prog_length)
                         // push variable into ints[]
 
                         if (!(var_int_ptr < VARIABLE_BUFFER_SIZE)) {
-                            perror("variable buffer overflow");
+                            perror("runtime err: variable buffer overflow");
                             exit(1);
                         }
 
@@ -233,7 +246,7 @@ void interpret(const char **program, int prog_length)
                         var_int_ptr++;
                     }
                 default:
-                    perror("unexpected variable type.");
+                    perror("err: unexpected variable type.");
                     exit(1);
             }
         }
