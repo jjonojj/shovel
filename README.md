@@ -24,9 +24,9 @@ the syntax of the programming language is not really defined yet, but i want it 
 
 ```c
 
-void main() {
+func main() {
     int x = 5;
-    print("hai");
+    print("hello!");
 }
 
 ```
