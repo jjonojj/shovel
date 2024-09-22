@@ -21,7 +21,7 @@ struct String {
 struct Function {
     std::string name;
     std::vector<std::string> body;
-}
+};
 
 Options parseargs(int argc, char **argv) {
     if (argc < 2) {
