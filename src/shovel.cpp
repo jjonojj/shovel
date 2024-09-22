@@ -2,10 +2,26 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cctype>
 
 struct Options {
     std::string name;
 };
+
+struct Integer {
+    std::string name;
+    int value;
+};
+
+struct String {
+    std::string name;
+    std::string value;
+};
+
+struct Function {
+    std::string name;
+    std::vector<std::string> body;
+}
 
 Options parseargs(int argc, char **argv) {
     if (argc < 2) {
@@ -18,11 +34,6 @@ Options parseargs(int argc, char **argv) {
 
     return opts;
 }
-
-#include <cctype>
-#include <iostream>
-#include <string>
-#include <vector>
 
 std::vector<std::string> tokenize(const std::string &input) {
     std::vector<std::string> tokens;
@@ -78,6 +89,34 @@ std::vector<std::string> tokenize(const std::string &input) {
     return tokens;
 }
 
+// example tokens:
+// func, main, (, ), {, print, (, "hai :3", ), ;, }
+
+int eval(std::string &proc) {
+    std::vector<std::string> tokens = tokenize(proc);
+
+    std::vector<Function> funcs;
+    std::vector<Integer> ints;
+    std::vector<String> strings;
+
+    int ptr = 0;
+
+    while (ptr < tokens.size()) {
+        std::string token = tokens[ptr];
+        // no switch for std::strings, so we use ifs :D
+
+        // expect function
+        if (token == "func") {
+            Function func;
+            func.name = token;
+
+            // increment ptr
+        }
+    }
+
+    return 0;
+}
+
 int main(int argc, char **argv) {
     Options opts = parseargs(argc, argv);
 
@@ -90,13 +129,5 @@ int main(int argc, char **argv) {
         proc += filetemp;
     }
 
-    std::cout << proc << std::endl;
-
-    std::cout << "tokenized thing: \n";
-
-    std::vector<std::string> tokens = tokenize(proc);
-
-    for (std::string token : tokens) {
-        std::cout << "[" << token << "]\n";
-    }
+    eval(proc);
 }
