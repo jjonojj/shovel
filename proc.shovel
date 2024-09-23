@@ -1,8 +1,8 @@
 func main()
 {
-    *echo hello
+    *echo hello;
 }
 
-*echo "hello from outside the function"
+*echo "hello from outside the function";
 
-main()
+main(); *echo "hello sushi";

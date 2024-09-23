@@ -11,6 +11,7 @@ enum class ErrorType {
     ERR_UNEXPECTED_TOKEN,
     ERR_MISSING_SEMICOLON
 };
+
 void err_exit(ErrorType type, std::string msg) {
     switch (type) {
         case ErrorType::ERR_UNEXPECTED_TOKEN:
@@ -18,6 +19,7 @@ void err_exit(ErrorType type, std::string msg) {
             exit(1);
         case ErrorType::ERR_MISSING_SEMICOLON:
             std::cout << "error -> missing semicolon: " << msg << std::endl;
+            exit(1);
     }
 }
 
@@ -155,6 +157,8 @@ int eval(std::vector<std::string> &proc) {
             handled = true;
             std::cout << tokens[ptr+1] << std::endl;
             ptr += 2;
+
+            statement_should_end = true;
         }
 
         if (!handled) {
@@ -176,6 +180,17 @@ int eval(std::vector<std::string> &proc) {
                 if (func.name == token) {
                     eval(func.body);
                 }
+            }
+            statement_should_end = true;
+        }
+
+
+        // AT THE VERY END !1!!111!!1!!!
+        if (statement_should_end) {
+            if (tokens[ptr] == ";") {
+                ptr++;
+            } else {
+                err_exit(ErrorType::ERR_MISSING_SEMICOLON, std::to_string(ptr));
             }
         }
     }
