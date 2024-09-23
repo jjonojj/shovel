@@ -54,6 +54,14 @@ Options parseargs(int argc, char **argv) {
     return opts;
 }
 
+std::string strip_quotes(std::string str) {
+    if (str[0] == '"' && str[str.size() - 1] == '"') {
+        return str.substr(1, str.size() - 2);
+    } else {
+        return str;
+    }
+}
+
 std::vector<std::string> tokenize(const std::string &input) {
     std::vector<std::string> tokens;
     std::string current_token;
@@ -155,7 +163,7 @@ int eval(std::vector<std::string> &proc) {
         // print macro (hardcoded) (yes)
         if (token == "*echo") {
             handled = true;
-            std::cout << tokens[ptr+1] << std::endl;
+            std::cout << strip_quotes(tokens[ptr+1]) << std::endl;
             ptr += 2;
 
             statement_should_end = true;

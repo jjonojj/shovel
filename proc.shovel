@@ -5,4 +5,4 @@ func main()
 
 *echo "hello from outside the function";
 
-main(); *echo "hello sushi";
+main(); *echo "no way multiple statements in one line";
