@@ -1,0 +1,8 @@
+func main()
+{
+    *echo hello
+}
+
+*echo "hello from outside the function"
+
+main()

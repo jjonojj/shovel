@@ -1,8 +1,25 @@
+#include <cwchar>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <ostream>
 #include <string>
 #include <vector>
 #include <cctype>
+
+enum class ErrorType {
+    ERR_UNEXPECTED_TOKEN,
+    ERR_MISSING_SEMICOLON
+};
+void err_exit(ErrorType type, std::string msg) {
+    switch (type) {
+        case ErrorType::ERR_UNEXPECTED_TOKEN:
+            std::cout << "error -> unexpected token: " << msg << std::endl;
+            exit(1);
+        case ErrorType::ERR_MISSING_SEMICOLON:
+            std::cout << "error -> missing semicolon: " << msg << std::endl;
+    }
+}
 
 struct Options {
     std::string name;
@@ -92,8 +109,8 @@ std::vector<std::string> tokenize(const std::string &input) {
 // example tokens:
 // func, main, (, ), {, print, (, "hai :3", ), ;, }
 
-int eval(std::string &proc) {
-    std::vector<std::string> tokens = tokenize(proc);
+int eval(std::vector<std::string> &proc) {
+    std::vector<std::string> tokens = proc;
 
     std::vector<Function> funcs;
     std::vector<Integer> ints;
@@ -102,15 +119,64 @@ int eval(std::string &proc) {
     int ptr = 0;
 
     while (ptr < tokens.size()) {
+        bool handled = false;
+        bool statement_should_end = false;
         std::string token = tokens[ptr];
         // no switch for std::strings, so we use ifs :D
 
         // expect function
         if (token == "func") {
+            handled = true;
             Function func;
-            func.name = token;
+            ptr++;
+            func.name = tokens[ptr];
+            ptr++;
+            if (tokens[ptr] != "(") err_exit(ErrorType::ERR_UNEXPECTED_TOKEN, tokens[ptr]);
+            // TODO: arguments
+            // ---
+            ptr++;
+            if (tokens[ptr] != ")") err_exit(ErrorType::ERR_UNEXPECTED_TOKEN, tokens[ptr]);
 
-            // increment ptr
+            ptr++;
+            if (tokens[ptr] != "{") err_exit(ErrorType::ERR_UNEXPECTED_TOKEN, tokens[ptr]);
+
+            ptr++;
+            while (tokens[ptr] != "}") {
+                func.body.push_back(tokens[ptr]);
+                ptr++;
+            }
+            ptr++;
+
+            funcs.push_back(func);
+        }
+
+        // print macro (hardcoded) (yes)
+        if (token == "*echo") {
+            handled = true;
+            std::cout << tokens[ptr+1] << std::endl;
+            ptr += 2;
+        }
+
+        if (!handled) {
+            // except a function call (or a macro, if i implement a working macro system)
+            if (tokens[ptr+1] != "(") {
+                // invalid function call, but i need WAY more error handling :(
+            }
+
+            std::string fn_query = token;
+            // valid function (i hope)
+            ptr+=2;
+            while (tokens[ptr] != ")") {
+                ptr++;
+            }
+            ptr++;
+
+            // actually call the function (might need to put this in a function if i implement macros and a std library and blablabla)
+            for (Function func : funcs) {
+                if (func.name == token) {
+                    eval(func.body);
+                }
+            }
         }
     }
 
@@ -128,6 +194,13 @@ int main(int argc, char **argv) {
     while (getline(inputfile, filetemp)) {
         proc += filetemp;
     }
+    /*
+    std::vector<std::string> temptokens = tokenize(proc);
+    for (std::string i : temptokens) {
+        std::cout << i << std::endl;
+    }
+    */
 
-    eval(proc);
+    std::vector<std::string> tokens = tokenize(proc);
+    eval(tokens);
 }
