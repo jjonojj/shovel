@@ -1,3 +1,4 @@
+#include <cstring>
 #include <cwchar>
 #include <cstdlib>
 #include <fstream>
@@ -23,23 +24,14 @@ void err_exit(ErrorType type, std::string msg) {
     }
 }
 
-struct Options {
-    std::string name;
-};
-
-struct Integer {
-    std::string name;
-    int value;
-};
-
-struct String {
-    std::string name;
-    std::string value;
-};
-
 struct Function {
     std::string name;
     std::vector<std::string> body;
+};
+
+struct Options {
+    std::string name;
+    bool shell;
 };
 
 Options parseargs(int argc, char **argv) {
@@ -50,6 +42,9 @@ Options parseargs(int argc, char **argv) {
 
     Options opts;
     opts.name = argv[1];
+    if (strcmp(argv[1], "sh") == 0) {
+        opts.shell = true;
+    }
 
     return opts;
 }
@@ -123,8 +118,6 @@ int eval(std::vector<std::string> &proc) {
     std::vector<std::string> tokens = proc;
 
     std::vector<Function> funcs;
-    std::vector<Integer> ints;
-    std::vector<String> strings;
 
     int ptr = 0;
 
@@ -158,6 +151,10 @@ int eval(std::vector<std::string> &proc) {
             ptr++;
 
             funcs.push_back(func);
+        }
+
+        if (token == "*proc_exit") {
+            return std::stoi(tokens[ptr+1]);
         }
 
         // print macro (hardcoded) (yes)
@@ -208,6 +205,17 @@ int eval(std::vector<std::string> &proc) {
 
 int main(int argc, char **argv) {
     Options opts = parseargs(argc, argv);
+    if (opts.shell) {
+        int ret_code = 0;
+        std::string input;
+        while (ret_code == 0) {
+            std::cout << ret_code << " > ";
+            getline (std::cin, input);
+            std::vector<std::string> tokens = tokenize(input);
+            ret_code = eval(tokens);
+        }
+        return ret_code;
+    }
 
     std::string proc;
     std::string filetemp;
